@@ -42,6 +42,19 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     });
 });
 
+app.get('/', (req: Request, res: Response) =>{
+    res.status(200) //OK
+    .json({
+        success:true,
+        message:'Welcome to WeatherHub API - By Ahmed alsaleh',
+        routes:{
+            auth:`POST: For Sign Up: "/auth/signup", Sign In: "/auth/signin", Sign Out: "/auth/signin" `,
+            weather:`Get: Weather With Specific coordinates: EX: "/weather?lat=24.71&lon=46.68" `,
+            history:`Get: History List: "/history" You can add some Query Params like: "/history?skip=0&limit=10&sort=-requestedAt"`,
+        }
+    })
+})
+
 app.listen(process.env.PORT, () => {
     logger.info(`Server Listen at Port ${process.env.PORT}`)
     connectDB()
