@@ -26,9 +26,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use('/api/auth', authRoutes);
-app.use('/api/history', historyRoutes);
-app.use('/api/weather', weatherRoutes);
+app.use('/auth', authRoutes);
+app.use('/history', historyRoutes);
+app.use('/weather', weatherRoutes);
 
 // Basic error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -37,7 +37,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     .status(500) //INTERNAL_SERVER_ERROR
     .json({
       success: false,
-      message: 'Something went wrong!',
+      message: `Something went wrong! ${err.message}`,
       error: process.env.NODE_ENV == 'development' ? err.message : undefined
     });
 });

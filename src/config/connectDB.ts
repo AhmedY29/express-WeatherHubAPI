@@ -13,7 +13,9 @@ export async function connectDB() {
         await mongoose.connection.db.admin().command({ ping: 1 });
     }
     logger.info('Pinged your deployment. You successfully connected to MongoDB!');
-  } catch {
+} catch (error: any) {
     await mongoose.disconnect();
+    logger.error(`Error in connect to MongoDB!: ${error.message}`);
+
   }
 }

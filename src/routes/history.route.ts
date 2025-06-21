@@ -1,3 +1,4 @@
+import { getHistory } from '../controllers/history.controller';
 import { Router } from 'express';
 
 
@@ -5,7 +6,7 @@ const router = Router();
 
 
 
-router.route('/')
+router.get('/', getHistory)
 
 
 export default router
