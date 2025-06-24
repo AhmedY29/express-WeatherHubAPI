@@ -1,3 +1,4 @@
+import { getHistoryService } from "../services/history.service";
 import { History } from "../models/history.model"
 import { verifyToken } from "../utils/generateToken"
 import { Request, Response } from "express";
@@ -21,21 +22,10 @@ export const getHistory = async (req: Request, res: Response) => {
         return
     }
     try {
-        if(count == 'true'){
-            const historyCount = await History.find();
-            res.status(200) //OK
-            .json({
-                success: true,
-                total: historyCount.length
-            })
-        }
-      const historyExist = await History.find({user: verify.userId}).populate({
-            path: 'weather',
-          }).sort(sort as string).limit(Number(limit)).skip(parseInt(skip as string))
-
+       const historyData = await getHistoryService(count, limit, skip, sort, verify)
       res.status(200).json({
         success:true,
-        data:historyExist
+        data:historyData
       })
     } catch (error: any) {
         res.status(400)

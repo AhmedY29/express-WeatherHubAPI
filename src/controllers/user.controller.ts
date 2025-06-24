@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import bcrypt from "bcrypt"
 import { generateToken, verifyToken } from "../utils/generateToken";
+import { getSignInService, getSignOutService, getSignUpService } from "../services/user.service";
 
 
 
@@ -19,39 +20,13 @@ export const signUp = async (req: Request, res: Response) => {
             return;
         }
 
-        const userExist = await User.findOne({ email });
+            // const header = new Headers({Authorization: `Bearer ${token}`})
+            // res.setHeaders(header)
 
-        if(userExist){
-            res.status(400)
-            .json({
-                success:false,
-                error:{
-                    message:"Email Already Exist"
-                }
-            })
-            return;
-        }
-
-        const HashPass: string = await bcrypt.hash(password, 10) ;
-
-        const newUser = new User({
-            email,
-            passwordHash: HashPass,
-            role:'user'
-        })
-        await newUser.save();
-
-        const token = generateToken(newUser._id)
-
-        const header = new Headers({Authorization: `Bearer ${token}`})
-        res.setHeaders(header)
+            const signUpService = await getSignUpService(email, password)
 
         res.status(201) //CREATED
-        .json({
-            success:true,
-            message:'Created User Successfully',
-            token
-        })
+        .json(signUpService)
     } catch (error: any) {
         res.status(400)
         .json({
@@ -79,38 +54,11 @@ export const signIn = async (req: Request, res: Response) => {
             return;
         }
 
-        const userExist = await User.findOne({ email });
-        if(!userExist){
-            res.status(401) // UNAUTHORIZED
-            .json({
-                success:false,
-                error:{
-                    message:"Email Or Password Invalid"
-                }
-            })
-            return;
-        }
-        const passCorrect = await bcrypt.compare(password, userExist.passwordHash)
-        if(!passCorrect){
-            res.status(401) // UNAUTHORIZED
-            .json({
-                success:false,
-                error:{
-                    message:"Email or Password Invalid"
-                }
-            })
-            return;
-        }
-
-        const token = generateToken(userExist._id)
-        
-        const header = new Headers({Authorization: `Bearer ${token}`})
-        res.setHeaders(header)
+        // const header = new Headers({Authorization: `Bearer ${token}`})
+        // res.setHeaders(header)
+        const signInService = await getSignInService(email, password)
     res.status(200) // OK
-    .json({success: true, message:'Logged in successfully',
-        data: {...userExist._doc, passwordHash: undefined},
-        token
-    })
+    .json(signInService)
 
     } catch (error: any) {
         res.status(400)
@@ -128,11 +76,10 @@ export const signOut = async (req: Request, res: Response) => {
     try {
         const tokenHeader = req.headers.authorization;
         console.log(tokenHeader)
-          if (!tokenHeader) {
+        if (!tokenHeader) {
         res.status(401).json({ error: 'Unauthorized: No token provided' });
         return;
         }
-
         const token = tokenHeader.split(" ")[1]
         const verify = verifyToken(token)
 
@@ -148,11 +95,10 @@ export const signOut = async (req: Request, res: Response) => {
             })
         }
 
+        const signOutService = await getSignOutService()
+
         res.status(200) // OK
-        .json({
-            success:true,
-            message: 'Logged out Successfully'
-        })
+        .json(signOutService)
 
     } catch (error: any) {
         res.status(400)
